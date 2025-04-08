@@ -20,15 +20,15 @@ The output is a short recommendation message, suitable for everyday users (no te
 
 ---
 
-## 🧠 Signal Processing Pipeline
+## 🧠 Signal Processing works
 
 The tool uses a chain of Web Audio nodes for analysis:
 
 1. **`MediaStreamSource`** — receives live audio input from the microphone.
 2. **`BiquadFilterNode`** (bandpass) — isolates the frequency range typical of human speech:
    - Frequency range: **250 Hz to 4000 Hz**
-   - Center frequency: `(250 + 4000) / 2 = 2125 Hz`
-   - Quality factor: `Q = center / bandwidth`
+   - Center frequency: $`\frac{(250 + 4000)}{2} = 2125 Hz`$
+   - Quality factor: $`Q = \frac{center frequency}{bandwidth}`$
 3. **`AnalyserNode`** — uses FFT (size 16384) to measure the frequency-domain energy.
 
 Every 2 seconds:
