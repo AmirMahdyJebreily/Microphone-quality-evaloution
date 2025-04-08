@@ -36,9 +36,7 @@ Every 2 seconds:
 - Estimates power of the **voice** and **background noise**
 - Calculates **SNR (in dB)** using:
 
-  $$
-  \text{SNR}_{dB} = 10 \cdot \log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
-  $$
+  $`\text{SNR}_{dB} = 10 \cdot \log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)`$
 
 ---
 
