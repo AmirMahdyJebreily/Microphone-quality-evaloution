@@ -53,10 +53,10 @@ function generateAudioAdvice(snr, rms) {
     advice += "صدا بیش از حد بلند است ممکن است باعث ایجاد نویز شود..";
     if (micQuality > 1) micQuality--;
   } else if (rms < 6) {
-    advice += "صدای شما بسیار کم است. ممکن است با نویز محیط ترکیب شود";
+    advice += "صدای شما بسیار کم است. ممکن است با نویز محیط ترکیب شود. فاصله میکروفون را تنظیم کنید";
     if (micQuality > 1) micQuality--;
   } else {
-    advice += "میکروفون را اندکی تنظیم کنید.";
+    advice += "فاصله میکروفون بنظر مناسب می‌آید."
   }
 
   return { message: advice.trim(), micQuality: micQuality };
