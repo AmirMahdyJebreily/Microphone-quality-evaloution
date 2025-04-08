@@ -5,6 +5,8 @@ A lightweight in-browser tool for evaluating **microphone signal quality** using
 ![Microphone Signal Quality Analyzer](image.png)
 
 [Persian Version](./README_Fa.md)
+
+
 ---
 
 ## 🔍 Overview
