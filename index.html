@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeAgha Mic quality evaluator</title>
+</head>
+<body>
+    <h1>CodeAgha Mic quality evaluator</h1>
+    <hr />
+    <button id="toggleRecord">Record</button>
+    <fieldset>
+        <legend>RMS</legend>
+        <p id="statusRMS"></p>
+    </fieldset>
+    <fieldset>
+        <legend>SNR</legend>
+        <p id="statusSNR"></p>
+    </fieldset>
+    <br />
+    <canvas width="300" height="145" id="frequencyCanvas"></canvas>
+    <div id="audioContainer"></div>
+    <script src="./script.js"></script>
+</body>
+</html>
