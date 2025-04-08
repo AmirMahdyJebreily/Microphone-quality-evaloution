@@ -21,36 +21,58 @@ toggleRecordButton.addEventListener("click", async () => {
   }
 });
 
-const FREQUENCY_START = 300;
-const FREQUENCY_END = 3500;
-const signalStart = (length, sampleRate) => Math.floor(length * (FREQUENCY_START / (sampleRate / 2)));
-const signalEnd = (length, sampleRate) => Math.floor(length * (FREQUENCY_END / (sampleRate / 2)));
+const FREQUENCY_START = 250;
+const FREQUENCY_END = 4000;
 const TIME = 2000;
 
-function classifySNR(snr) {
-  const categories = [
-    { min: -Infinity, max: 1, label: "خیلی داغون" },
-    { min: 1, max: 3, label: "داغون" },
-    { min: 3, max: 6, label: "بد" },
-    { min: 6, max: 9, label: "قابل قبول" },
-    { min: 9, max: 12, label: "متوسط" },
-    { min: 12, max: 14, label: "خوب" },
-    { min: 14, max: 16, label: "خیلی خوب" },
-    { min: 16, max: 17, label: "عالی" },
-    { min: 17, max: 18, label: "کیفیت استدیو" },
-    { min: 18, max: Infinity, label: "خفن ترین کیفیت" }
-  ];
-  for (let category of categories) {
-    if (snr >= category.min && snr < category.max) {
-      return category.label;
-    }
+function generateAudioAdvice(snr, rms) {
+  let advice = "";
+  let micQuality = 0;
+
+  // بررسی کیفیت ضبط بر اساس نسبت سیگنال به نویز (SNR)
+  if (snr >= 18) {
+    advice += "کیفیت صدا بسیار عالی است، ";
+    micQuality = 5;
+  } else if (snr >= 15) {
+    advice += "صدا خوب است، اگر میتوانید اندکی نویز محیط را کم کنید. ";
+    micQuality = 4;
+  } else if (snr >= 10) {
+    advice += "صدا بد نیست، ولی بهتر است در محیط آرم تری ضبط کنید ،";
+    micQuality = 3;
+  } else if (snr >= 7) {
+    advice += "کیفیت چندان مناسب نیست. در محیط آرام تری ضبط کنید ،";
+    micQuality = 2;
+  } else {
+    advice += "صدا اصلا خوب نیست، محیط را عوض کنید،";
+    micQuality = 1;
   }
-  return "Unknown";
+
+  // بررسی سطح صدای ضبط‌شده (RMS)
+  // در بسیاری از کاربردهای صوتی، سطح مطلوب صدای ضبط‌شده بین حدود 22 تا 27 دسی‌بل در نظر گرفته می‌شود.
+  if (rms > 70) {
+    advice += "صدا بیش از حد بلند است ممکن است باعث ایجاد نویز شود..";
+    if (micQuality > 1) micQuality--;
+  } else if (rms < 6) {
+    advice += "صدای شما بسیار کم است. ممکن است با نویز محیط ترکیب شود";
+    if (micQuality > 1) micQuality--;
+  } else {
+    advice += "میکروفون را اندکی تنظیم کنید.";
+  }
+
+  return { message: advice.trim(), micQuality: micQuality };
 }
 
+let rmsSignal = 0;
+let rmsNoise = 0;
 let avg_P_signal = 0
 let avg_P_noise = 0
 let snr = 0
+
+let noise_record = true
+
+const FREQUENCY_RANGE = (FREQUENCY_END - FREQUENCY_START);
+const CENTER_FREQUENCY = FREQUENCY_RANGE / 2;
+const _Q = CENTER_FREQUENCY / FREQUENCY_RANGE
 
 async function startRecording() {
   try {
@@ -59,63 +81,60 @@ async function startRecording() {
     const source = audioContext.createMediaStreamSource(stream);
     const bandPassFilter = audioContext.createBiquadFilter();
     bandPassFilter.type = 'bandpass';
-    bandPassFilter.frequency.value = (FREQUENCY_END - FREQUENCY_START) / 2;
-    bandPassFilter.Q.value = 0.75;
+    bandPassFilter.frequency.value = CENTER_FREQUENCY;
+    bandPassFilter.Q.value = _Q;
+    source.connect(bandPassFilter);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 16384;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    source.connect(bandPassFilter);
     bandPassFilter.connect(analyser);
-
-
 
     setInterval(() => {
       if (recording) {
-        
-        snr = analyzeSNR(avg_P_signal, avg_P_noise);
+        if (!noise_record) {
+          snr = analyzeSNR(avg_P_signal, avg_P_noise);
+        }
 
+        let feedback = generateAudioAdvice(snr, avg_P_signal, avg_P_noise, rmsSignal)     
+        snrLabel.innerHTML = `SNR: ${snr.toFixed(2)}<br/>${feedback.message}<br/>${feedback.micQuality}`
+
+        noise_record = false
         avg_P_signal = 0
-        avg_P_noise = 0
-
-        snrLabel.innerHTML = `SNR: ${snr.toFixed(2)}<br/>${classifySNR(snr)}`
-        console.clear()
       }
     }, TIME)
 
-    const freqRange = {
-      start: signalStart(bufferLength, audioContext.sampleRate),
-      end: signalEnd(bufferLength, audioContext.sampleRate)
-    }
     function checkQuality() {
       analyser.getByteFrequencyData(dataArray);
       let sumSignalSquares = 0;
       let sumNoiseSquares = 0;
-      let countOfSignalFreq = FREQUENCY_END - FREQUENCY_START
 
-      for (let i = 0; i < bufferLength; i++) {
-        if (i >= freqRange.start && i <= freqRange.end) {
-          sumSignalSquares += dataArray[i] ** 2
+      for (let i = FREQUENCY_START; i < FREQUENCY_END; i++) {
+        if (!noise_record) {
+          sumSignalSquares += dataArray[i] ** 2      
         } else {
           sumNoiseSquares += dataArray[i] ** 2
         }
       }
 
-      const rmsSignal = Math.sqrt(sumSignalSquares / countOfSignalFreq);
-      const rmsNoise = Math.sqrt(sumNoiseSquares / (bufferLength - countOfSignalFreq));
+      rmsSignal = Math.sqrt(sumSignalSquares / FREQUENCY_RANGE);
+      rmsNoise = Math.sqrt(sumNoiseSquares / FREQUENCY_RANGE);
 
-      avg_P_signal += (rmsSignal * rmsSignal) / countOfSignalFreq
-      avg_P_noise += (rmsNoise * rmsNoise) / (bufferLength - countOfSignalFreq)
+      if (!noise_record) {
+        avg_P_signal += (rmsSignal * rmsSignal) / FREQUENCY_RANGE;
+      } else {
+        avg_P_noise += (rmsNoise * rmsNoise) / FREQUENCY_RANGE;
+      }
 
-      console.log(`Signal RMS Level: ${rmsSignal.toFixed(2)} - ${(talking) ? 'talking' : 'no talk'}`);
+      console.log(`Ps: ${avg_P_signal.toFixed(2)} - Pn: ${avg_P_noise.toFixed(2)} - ${(talking) ? 'talking' : 'no talk'}`);
 
-      if (rmsSignal < 25) {
-        rmsLabel.innerHTML = "صحبت نمیکنید";
+      if (rmsSignal < 20) {
+        rmsLabel.innerHTML = (!noise_record) ? "برای پردازش صدای خودتان صحبت کنید" : "در حال پردازش نویز محیط، صحبت نکنید"
         talking = false
       } else if (rmsSignal > 70) {
         rmsLabel.innerHTML = "ممکن است صدا بیش از حد بلند باشد.";
       } else {
-        rmsLabel.innerHTML = "درحل صحبت";
+        rmsLabel.innerHTML = "درحل صحبت هستید";
         talking = true
       }
       //plot(dataArray, bufferLength)
