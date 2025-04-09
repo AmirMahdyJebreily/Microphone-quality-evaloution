@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeAgha Mic quality evaluator</title>
+    <script type="module" src="./script.js"></script>
 </head>
 <body>
     <h1>CodeAgha Mic quality evaluator</h1>
     <hr />
     <button id="toggleRecord">Record</button>
     <button id="btnReset">Reset all</button>
-    <button id="btnResetNoise">Reset Noise (One)</button>
-    <button id="btnResetNoiseContinuous">Reset noise (continuous) (off)</button>
+    <button id="btnResetNoise">Reset Noise</button>
     <fieldset>
         <legend>RMS</legend>
         <p id="statusRMS"></p>
@@ -20,9 +20,5 @@
         <legend>SNR</legend>
         <p id="statusSNR"></p>
     </fieldset>
-    <br />
-    <canvas width="300" height="145" id="frequencyCanvas"></canvas>
-    <div id="audioContainer"></div>
-    <script type="module" src="./script.js"></script>
 </body>
 </html>

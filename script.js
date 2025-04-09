@@ -1,68 +1,67 @@
 // main.js
 import { AudioProcessor } from "./audioProcessor.js";
 
-// مقدار دهی اولیه به پردازشگر صوتی با زمان آپدیت دلخواه (مثلاً 2000 میلی‌ثانیه)
-const processor = new AudioProcessor(2000);
+// مقداردهی اولیه پردازشگر صوتی با زمان آپدیت دلخواه (مثلاً 2000 میلی‌ثانیه)
+// در اینجا alternating می‌تواند true یا false باشد؛ true یعنی هر سیکل حالت تغییر می‌کند.
+const processor = new AudioProcessor(2000, 250, 4000, false);
 
-// المان‌های DOM
 const toggleRecordButton = document.querySelector('#toggleRecord');
 const toggleResetButton = document.querySelector('#btnReset');
 const toggleResetNoiseButton = document.querySelector('#btnResetNoise');
-const rmsLabel = document.querySelector('#statusRMS');
-const snrLabel = document.querySelector('#statusSNR');
+const statusRMS = document.querySelector('#statusRMS');
+const statusSNR = document.querySelector('#statusSNR');
 
 let recording = false;
 const RECORD = 'Record';
 const STOP = 'Stop';
 
-// رویداد شروع/متوقف کردن ضبط
+// شروع/توقف ضبط
 toggleRecordButton.addEventListener("click", async () => {
   recording = !recording;
   if (recording) {
     toggleRecordButton.innerHTML = STOP;
     try {
       await processor.start();
-      console.log("Audio processing started");
+      console.log("شروع پردازش صدا");
     } catch (err) {
-      console.error("Error starting processor:", err);
-      rmsLabel.innerHTML = `خطا: ${err.message}`;
+      console.error("خطا در شروع پردازش:", err);
+      statusRMS.innerHTML = `خطا: ${err.message}`;
     }
   } else {
     toggleRecordButton.innerHTML = RECORD;
-    // در حالت توقف، می‌توانید مقادیر را ریست و یا پیغام مناسب نمایش دهید.
-    rmsLabel.innerHTML = "برای شروع ضبط، دکمه Record را بزنید.";
-    snrLabel.innerHTML = "...";
+    statusRMS.innerHTML = "روی دکمه Record کلیک کنید و منتظر بمانید تا نویز اندازه‌گیری شود.";
+    statusSNR.innerHTML = "...";
     processor.stop();
   }
 });
 
-
-// دکمه ریست برای حالت کلی
+// دکمه ریست کلی (برای ریست مقادیر تجمعی نویز و سیگنال)
+// توجه داشته باشید که این عمل باعث پاک شدن avgPNoise نیز می‌شود.
 toggleResetButton.addEventListener("click", () => {
-  // ریست وضعیت‌های نمایش داده شده
-  rmsLabel.innerHTML = "برای شروع ضبط، دکمه Record را بزنید.";
-  snrLabel.innerHTML = "...";
+  processor.resetMeasurements();
   recording = false;
   processor.stop();
+  toggleRecordButton.innerHTML = RECORD;
+  statusRMS.innerHTML = "روی دکمه Record کلیک کنید و منتظر بمانید.";
+  statusSNR.innerHTML = "...";
 });
 
-// دکمه ریست نویز: به ماژول اطلاع می‌دهیم که در دوره بعد نویز اندازه‌گیری شود
+// دکمه ریست حالت نویز؛ در این حالت تنها تجمع نویز و سیگنال ریست می‌شود بدون توقف پردازش
 toggleResetNoiseButton.addEventListener("click", () => {
-  // اگر بخواهید بین حالت‌های نویز و سیگنال تغییر دهید:
-  processor.setNoiseMode(true);
-  console.log("حالت اندازه‌گیری نویز فعال شد.");
+  processor.resetMeasurements();
+  console.log("تنظیمات نویز و سیگنال ریست شدند (avgNoise حفظ نمی‌شود).");
 });
 
-// دریافت رویداد آپدیت از ماژول و بروزرسانی DOM
+// دریافت رویداد آپدیت از ماژول و به‌روز کردن DOM
 processor.addEventListener("update", (event) => {
   const { rmsSignal, rmsNoise, snr, noiseMode, timestamp } = event.detail;
   if (noiseMode) {
-    rmsLabel.innerHTML = `در حال اندازه‌گیری نویز...<br/>RMS Noise: ${rmsNoise}`;
-    snrLabel.innerHTML = `SNR: --`;
+    // در حالت نویز، فقط مقدار نویز نمایش داده می‌شود؛ SNR = --
+    statusRMS.innerHTML = `در حال اندازه‌گیری نویز<br/>RMS Noise: ${rmsNoise}`;
+    statusSNR.innerHTML = `SNR: --`;
   } else {
-    rmsLabel.innerHTML = `RMS Signal: ${rmsSignal}`;
-    snrLabel.innerHTML = `SNR: ${snr} dB`;
+    statusRMS.innerHTML = `RMS Signal: ${rmsSignal}`;
+    statusSNR.innerHTML = `SNR: ${snr} dB`;
   }
-  //processor.setNoiseMode(false);
-  console.log("Update at", new Date(timestamp).toLocaleTimeString(), event.detail);
+  console.log("بروزرسانی در", new Date(timestamp).toLocaleTimeString(), event.detail);
 });

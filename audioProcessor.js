@@ -23,8 +23,8 @@ export class AudioProcessor extends EventTarget {
     this.signalFrames = 0;
     this.noiseFrames = 0;
 
-    this.rmsSignal = 0;
-    this.rmsNoise = 0;
+    this.rmsSignal = 1;
+    this.rmsNoise = 1;
     this.snr = 0;
 
     this.audioContext = null;
@@ -124,11 +124,15 @@ export class AudioProcessor extends EventTarget {
     const rms = Math.sqrt(sumSquares / this.freqRange);
 
     if (this.noiseMode) {
-      this.rmsNoise = rms;
+      if(rms > 0){
+        this.rmsNoise *= rms ** (1/this.freqRange);
+      }
       this.sumPNoise += (rms * rms);
       this.noiseFrames++;
     } else {
-      this.rmsSignal = rms;
+      if(rms > 0){
+      this.rmsSignal *= rms ** (1/this.freqRange);
+      }
       this.sumPSignal += (rms * rms);
       this.signalFrames++;
     }
@@ -140,17 +144,17 @@ export class AudioProcessor extends EventTarget {
   _startUpdateTimer() {
     this.updateTimerId = setInterval(() => {
       if (!this.noiseMode) {
-        const avgSignal = this.signalFrames ? this.sumPSignal / this.signalFrames : 0;
-        const avgNoise = this.noiseFrames ? this.sumPNoise / this.noiseFrames : 0;
-        this.snr = avgNoise > 0 ? 10 * Math.log10(avgSignal / avgNoise) : 0;
+        const avgSignal = this.signalFrames ? (this.sumPSignal / this.signalFrames) : 0;
+        const avgNoise = this.noiseFrames ? (this.sumPNoise / this.noiseFrames) : 0;
+        this.snr = avgNoise > 0 ? (10 * Math.log10(avgSignal / avgNoise)) : 0;
       } else {
         this.snr = 0;
       }
 
       const detail = {
-        rmsSignal: this.rmsSignal.toFixed(2),
-        rmsNoise: this.rmsNoise.toFixed(2),
-        snr: this.snr.toFixed(2),
+        rmsSignal: this.rmsSignal,
+        rmsNoise: this.rmsNoise,
+        snr: this.snr,
         noiseMode: this.noiseMode,
         timestamp: Date.now()
       };
@@ -160,6 +164,8 @@ export class AudioProcessor extends EventTarget {
       if (!this.noiseMode) {
         this.sumPSignal = 0;
         this.signalFrames = 0;
+        this.rmsSignal = 1
+        this.rmsNoise = 1
       }
       
       if (this.alternating) {
@@ -167,6 +173,8 @@ export class AudioProcessor extends EventTarget {
         if (!this.noiseMode) {
           this.sumPSignal = 0;
           this.signalFrames = 0;
+          this.rmsSignal = 1
+          this.rmsNoise = 1
         }
       } else {
         if (this.noiseMode) {
