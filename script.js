@@ -4,13 +4,14 @@ const STOP = 'Stop';
 const RECORD = 'Record';
 
 const toggleRecordButton = document.querySelector('#toggleRecord');
+const toggleResetButton = document.querySelector('#btnReset');
+const toggleResetNoiseButton = document.querySelector('#btnResetNoise');
+const toggleResetNoiseCButton = document.querySelector('#btnResetNoiseContinuous');
 const rmsLabel = document.querySelector('#statusRMS');
 const snrLabel = document.querySelector('#statusSNR');
 const frequencyCanvas = document.getElementById("frequencyCanvas");
 const canvasContext = frequencyCanvas.getContext("2d");
 
-let recording = false;
-let talking = false;
 toggleRecordButton.addEventListener("click", async () => {
   recording = !recording;
   if (recording) {
@@ -18,49 +19,17 @@ toggleRecordButton.addEventListener("click", async () => {
     await startRecording();
   } else {
     toggleRecordButton.innerHTML = RECORD;
+    rmsLabel.innerHTML = "Click on the Record Button and wait 2 sec's for meassuring noise.<br/>then speek for voice quality evaloution"
+    snrLabel.innerHTML = "..."
   }
 });
 
 const FREQUENCY_START = 250;
 const FREQUENCY_END = 4000;
+const FREQUENCY_RANGE = (FREQUENCY_END - FREQUENCY_START);
+const CENTER_FREQUENCY = FREQUENCY_RANGE / 2;
+const _Q = CENTER_FREQUENCY / FREQUENCY_RANGE
 const TIME = 2000;
-
-function generateAudioAdvice(snr, rms) {
-  let advice = "";
-  let micQuality = 0;
-
-  // بررسی کیفیت ضبط بر اساس نسبت سیگنال به نویز (SNR)
-  if (snr >= 18) {
-    advice += "کیفیت صدا بسیار عالی است، ";
-    micQuality = 5;
-  } else if (snr >= 15) {
-    advice += "صدا خوب است، اگر میتوانید اندکی نویز محیط را کم کنید. ";
-    micQuality = 4;
-  } else if (snr >= 10) {
-    advice += "صدا بد نیست، ولی بهتر است در محیط آرم تری ضبط کنید ،";
-    micQuality = 3;
-  } else if (snr >= 7) {
-    advice += "کیفیت چندان مناسب نیست. در محیط آرام تری ضبط کنید ،";
-    micQuality = 2;
-  } else {
-    advice += "صدا اصلا خوب نیست، محیط را عوض کنید،";
-    micQuality = 1;
-  }
-
-  // بررسی سطح صدای ضبط‌شده (RMS)
-  // در بسیاری از کاربردهای صوتی، سطح مطلوب صدای ضبط‌شده بین حدود 22 تا 27 دسی‌بل در نظر گرفته می‌شود.
-  if (rms > 70) {
-    advice += "صدا بیش از حد بلند است ممکن است باعث ایجاد نویز شود..";
-    if (micQuality > 1) micQuality--;
-  } else if (rms < 6) {
-    advice += "صدای شما بسیار کم است. ممکن است با نویز محیط ترکیب شود. فاصله میکروفون را تنظیم کنید";
-    if (micQuality > 1) micQuality--;
-  } else {
-    advice += "فاصله میکروفون بنظر مناسب می‌آید."
-  }
-
-  return { message: advice.trim(), micQuality: micQuality };
-}
 
 let rmsSignal = 0;
 let rmsNoise = 0;
@@ -69,10 +38,74 @@ let avg_P_noise = 0
 let snr = 0
 
 let noise_record = true
+let reset_noise_record = flase
+let recording = false;
+let talking = false;
 
-const FREQUENCY_RANGE = (FREQUENCY_END - FREQUENCY_START);
-const CENTER_FREQUENCY = FREQUENCY_RANGE / 2;
-const _Q = CENTER_FREQUENCY / FREQUENCY_RANGE
+
+toggleResetButton.addEventListener("click", () => {
+  rmsSignal = 0;
+  rmsNoise = 0;
+  avg_P_signal = 0
+  avg_P_noise = 0
+  snr = 0
+
+  noise_record = true
+  recording = false;
+  talking = false;
+
+  toggleRecordButton.innerHTML = RECORD;
+  rmsLabel.innerHTML = "Click on the Record Button and wait 2 sec's for meassuring noise.<br/>then speek for voice quality evaloution"
+  snrLabel.innerHTML = "..."
+})
+
+
+
+toggleResetNoiseButton.addEventListener("click", () => {
+  noise_record = true
+  avg_P_signal = 0
+  avg_P_noise = 0
+  snr = 0
+})
+
+
+
+function generateAudioAdvice(snr, rms) {
+  let advice = "";
+  let micQuality = 0;
+
+  // بررسی کیفیت ضبط بر اساس نسبت سیگنال به نویز (SNR)
+  if (snr >= 18) {
+    advice += "صدا بسیار عالی است، ";
+    micQuality = 5;
+  } else if (snr >= 15) {
+    advice += "صدا خوب است، ";
+    micQuality = 4;
+  } else if (snr >= 10) {
+    advice += "صدا بد نیست، ";
+    micQuality = 3;
+  } else if (snr >= 5) {
+    advice += "صدا چندان مناسب نیست. در محیط آرام‌تری ضبط کنید ،";
+    micQuality = 2;
+  } else {
+    advice += "صدا اصلا خوب نیست، ممکن است صحبت های شما درست پردازش نشود،";
+    micQuality = 1;
+  }
+
+  // بررسی سطح صدای ضبط‌شده (RMS)
+  // در بسیاری از کاربردهای صوتی، سطح مطلوب صدای ضبط‌شده بین حدود 22 تا 27 دسی‌بل در نظر گرفته می‌شود.
+  if (rms > 120) {
+    advice += "صدا بیش از حد بلند است ممکن است باعث ایجاد نویز شود..";
+    if (micQuality > 1) micQuality--;
+  } else if (rms < 6) {
+    advice += "فاصله میکروفون را تنظیم کنید.";
+    if (micQuality > 1) micQuality--;
+  } else {
+    advice += "فاصله میکروفون بنظر مناسب می‌آید."
+  }
+
+  return { message: advice.trim(), micQuality: micQuality };
+}
 
 async function startRecording() {
   try {
@@ -95,12 +128,19 @@ async function startRecording() {
         if (!noise_record) {
           snr = analyzeSNR(avg_P_signal, avg_P_noise);
         }
-
-        let feedback = generateAudioAdvice(snr, avg_P_signal, avg_P_noise, rmsSignal)     
+        let feedback = generateAudioAdvice(snr, avg_P_signal, avg_P_noise, rmsSignal)
         snrLabel.innerHTML = `SNR: ${snr.toFixed(2)}<br/>${feedback.message}<br/>${feedback.micQuality}`
 
-        noise_record = false
-        avg_P_signal = 0
+        if (reset_noise_record) {
+          noise_record = !noise_record
+          if (noise_record == true) {
+            avg_P_signal = 0
+            avg_P_noise = 0
+          } else {
+            avg_P_signal = 0
+          }
+        }
+
       }
     }, TIME)
 
@@ -111,7 +151,7 @@ async function startRecording() {
 
       for (let i = FREQUENCY_START; i < FREQUENCY_END; i++) {
         if (!noise_record) {
-          sumSignalSquares += dataArray[i] ** 2      
+          sumSignalSquares += dataArray[i] ** 2
         } else {
           sumNoiseSquares += dataArray[i] ** 2
         }
