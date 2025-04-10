@@ -1,4 +1,3 @@
-// audioProcessor.ts
 export type AudioProcessorUpdateEvent = {
     rmsSignal: number,
     rmsNoise: number,
