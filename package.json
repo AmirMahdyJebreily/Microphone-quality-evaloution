@@ -1,6 +1,6 @@
 {
   "name": "microphone-quality-evaloution",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A lightweight in-browser tool for evaluating microphone signal quality using the Web Audio API.",
   "main": "./dist/audioProcessor.js",
   "types": "./dist/audioProcessor.d.ts",
