@@ -2,6 +2,11 @@
 
 A lightweight in-browser tool for evaluating **microphone signal quality** using the Web Audio API. It is designed to help users prepare optimal audio input for **speech-to-text models** such as Whisper, VOSK, or DeepSpeech — without requiring control over gain settings.
 
+## Install and usage 
+```bash
+npm i microphone-quality-evaloution@latest
+```
+
 ![Microphone Signal Quality Analyzer](./docs/screen.png)
 
 [Persian Version](./docs/README_Fa.md)
