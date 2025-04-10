@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,19 +8,34 @@
     <link rel="stylesheet" href="./styles/style.css">
     <script type="module" src="./scripts/script.js"></script>
 </head>
+
 <body>
-    <h1>CodeAgha Mic quality evaluator</h1>
-    <hr />
-    <button id="toggleRecord">Record</button>
-    <button id="btnReset">Reset all</button>
-    <button id="btnResetNoise">Reset Noise</button>
-    <fieldset>
-        <legend>RMS</legend>
-        <p id="statusRMS"></p>
-    </fieldset>
-    <fieldset>
-        <legend>SNR</legend>
-        <p id="statusSNR"></p>
-    </fieldset>
+    <header>
+        <h1>CodeAgha Mic quality evaluator</h1>
+        <br />
+        <div>
+            <a href="https://github.com/AmirMahdyJebreily/Microphone-quality-evaloution">GitHub</a> |
+            <a href="https://t.me/codeaghajcs">Telegram</a> |
+            <a href="https://www.coffeebede.com/codeagha">Donations</a>
+        </div>
+    </header>
+    <main>
+        <br />
+        <button id="toggleRecord">Record</button>
+        <button id="btnReset">Reset all</button>
+        <button id="btnResetNoise">Reset Noise</button>
+        <br />
+        <fieldset>
+            <legend>RMS</legend>
+            <p id="statusRMS">Click on Record button and wait for processing noise...</p>
+        </fieldset>
+        <fieldset>
+            <legend>SNR</legend>
+            <p id="statusSNR">SNR:--</p>
+        </fieldset>
+    </main>
+
+
 </body>
+
 </html>

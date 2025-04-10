@@ -1,0 +1,118 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #6200ea;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+/* filepath: d:\Projects\Microphone-quality-evaloution\styles\style.css */
+
+/* Responsive Main Content */
+main {
+    max-width: 1200px; /* Limit the width for larger screens */
+    margin: 0 auto; /* Center the main content */
+    padding: 20px; /* Add padding for spacing */
+    box-sizing: border-box; /* Include padding in the element's total width/height */
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 10px; /* Further reduce padding for very small screens */
+    }
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+section h2 {
+    color: #6200ea;
+    border-bottom: 2px solid #6200ea;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+/* Button styles */
+button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+button:hover {
+    background-color: #3700b3;
+}
+
+/* filepath: d:\Projects\Microphone-quality-evaloution\styles\style.css */
+
+/* Link styles */
+header a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+header a:hover {
+    color: #ffcc00;
+}
+
+/* Fieldset styles */
+fieldset {
+    border: 2px solid #6200ea;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    background-color: #f9f9ff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+fieldset legend {
+    font-weight: bold;
+    color: #6200ea;
+    padding: 0 10px;
+}
+
+fieldset p {
+    margin: 10px 0;
+    font-size: 1em;
+    color: #333;
+}
+
+
+/* Footer styles */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

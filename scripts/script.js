@@ -15,17 +15,17 @@ let recording = false;
 const RECORD = 'Record';
 const STOP = 'Stop';
 
-// شروع/توقف ضبط
+// Start/Stop recording
 toggleRecordButton.addEventListener("click", async () => {
   recording = !recording;
   if (recording) {
     toggleRecordButton.innerHTML = STOP;
     try {
       await processor.start();
-      console.log("شروع پردازش صدا");
+      console.log("Start processing...");
     } catch (err) {
-      console.error("خطا در شروع پردازش:", err);
-      statusRMS.innerHTML = `خطا: ${err.message}`;
+      console.error("An error in start processing: ", err);
+      statusRMS.innerHTML = `Error: ${err.message}`;
     }
   } else {
     toggleRecordButton.innerHTML = RECORD;
