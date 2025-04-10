@@ -1,4 +1,12 @@
 // audioProcessor.ts
+export type AudioProcessorUpdateEvent = {
+    rmsSignal: number,
+    rmsNoise: number,
+    snr: number,
+    noiseMode: boolean,
+    timestamp: number
+}
+
 export class AudioProcessor extends EventTarget {
     timeInterval: number;
     freqStart: number;
@@ -164,7 +172,7 @@ export class AudioProcessor extends EventTarget {
                 this.snr = 0;
             }
 
-            const detail = {
+            const detail: AudioProcessorUpdateEvent = {
                 rmsSignal: this.rmsSignal,
                 rmsNoise: this.rmsNoise,
                 snr: this.snr,
