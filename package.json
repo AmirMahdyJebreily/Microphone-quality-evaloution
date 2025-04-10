@@ -1,0 +1,26 @@
+{
+  "name": "microphone-quality-evaloution",
+  "version": "0.0.6",
+  "description": "A lightweight in-browser tool for evaluating microphone signal quality using the Web Audio API.",
+  "main": "./dist/audioProcessor.js",
+  "types": "./dist/audioProcessor.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "pub": "npm run build && npm version patch --force && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmirMahdyJebreily/Microphone-quality-evaloution.git"
+  },
+  "author": "CodeAgha (Amir Mahdy jebreily)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AmirMahdyJebreily/Microphone-quality-evaloution/issues"
+  },
+  "homepage": "https://github.com/AmirMahdyJebreily/Microphone-quality-evaloution#readme"
+}
