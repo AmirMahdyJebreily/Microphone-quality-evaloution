@@ -56,13 +56,13 @@ export class AudioProcessor extends EventTarget {
         this.rafId = null;
     }
 
-    async start(): Promise<void> {
+    async start(mediaStream?:MediaStream , audioContext?:AudioContext): Promise<void> {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             return Promise.reject(new Error("Microphone not supported"));
         }
         try {
-            this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.audioContext = new (window.AudioContext)();
+            this.mediaStream = mediaStream ?? await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.audioContext = audioContext ?? new (window.AudioContext)();
 
             const source = this.audioContext.createMediaStreamSource(this.mediaStream);
             this.bandPassFilter = this.audioContext.createBiquadFilter();
