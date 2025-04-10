@@ -71,7 +71,7 @@ button:hover {
 /* filepath: d:\Projects\Microphone-quality-evaloution\styles\style.css */
 
 /* Link styles */
-header a {
+header a, footer a {
     color: #ffffff;
     text-decoration: none;
     margin: 0 10px;
@@ -115,4 +115,20 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+#adviece{
+    color: #6200ea;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+#quality {
+    color: #6200ea;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 12px 0;
+    text-align: center;
 }
